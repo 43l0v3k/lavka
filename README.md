@@ -35,18 +35,21 @@ Windows: `set LAVKA_TG_TOKEN=...` перед `python app.py`. Linux: `LAVKA_TG_T
 
 **Для продакшена** (когда выведешь в интернет) вместо `app.run` запускай через waitress: `pip install waitress`, `waitress-serve --port=8080 app:app`. Наружу — через Cloudflare Tunnel (без белого IP), тогда будет и HTTPS.
 
-## 1а. Выход в интернет через Cloudflare Tunnel
+## 1а. Комп на полке: сервер + Cloudflare Tunnel + адрес в Telegram
 
-Белый IP и проброс портов не нужны, HTTPS получаешь бесплатно.
+Бесплатно. Белый IP и проброс портов не нужны, HTTPS есть.
 
-1. `pip install -r server/requirements.txt`
-2. Скачай `cloudflared` с https://github.com/cloudflare/cloudflared/releases (для Windows — `cloudflared-windows-amd64.exe`, переименуй в `cloudflared.exe`, положи в `server/`).
-3. Запусти `server/start.bat` (Linux: `server/start.sh`).
-4. В окне туннеля появится адрес `https://что-то-там.trycloudflare.com`. Его открывай в браузере и вписывай в приложении (Профиль → Адрес сервера).
+**Один раз, когда будешь за компом (Windows):**
+1. Поставь Python (галочка «Add to PATH»), в папке `server` выполни `pip install -r requirements.txt`.
+2. Скачай `cloudflared-windows-amd64.exe` с https://github.com/cloudflare/cloudflared/releases, переименуй в `cloudflared.exe`, положи в `server/`.
+3. Создай бота в @BotFather, свой числовой ID узнай у @userinfobot, нажми Start у своего бота.
+4. Скопируй `lavka.env.example` в `lavka.env` и впиши токен и ID.
+5. Проверь запуск: `start.bat`. Должно прийти сообщение «🟢 Лавка онлайн» с адресом.
+6. Запусти `install_autostart.bat`: дальше Лавка стартует сама при входе в Windows, без окна. Чтобы работало после перезагрузки без тебя, включи автовход в Windows (`netplwiz`).
 
-Минусы быстрого туннеля: адрес **меняется при каждом запуске**, и он работает, только пока включены комп и окно с туннелем. Постоянный адрес — это именованный туннель: нужен бесплатный аккаунт Cloudflare и свой домен (`cloudflared tunnel login` → `create` → `route dns`).
+**Дальше без компа:** включил комп, через минуту в Telegram приходит адрес `https://….trycloudflare.com`. Вставь его в приложении (Профиль → Адрес сервера). Потерял сообщение — напиши боту `/url`.
 
-Если включил Telegram-бота, задай `LAVKA_PUBLIC_URL` на адрес туннеля, тогда в уведомлении будет ссылка на чат.
+Адрес быстрого туннеля меняется при каждом запуске. Если туннель или сервер падают, `run.py` перезапускает их сам, лог лежит в `server/data/run.log`.
 
 ⚠️ Когда сервер виден из интернета, регистрация открыта всем. Следи за размером `server/data/uploads`.
 

@@ -5,3 +5,5 @@ server/data/
 build/
 local.properties
 .idea/
+server/lavka.env
+server/cloudflared*

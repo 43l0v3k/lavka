@@ -19,6 +19,8 @@ TOKEN = os.environ.get("LAVKA_TG_TOKEN", "").strip()
 PROXY = os.environ.get("LAVKA_TG_PROXY", "").strip()
 PUBLIC_URL = os.environ.get("LAVKA_PUBLIC_URL", "").strip().rstrip("/")
 
+ADMIN_TG = os.environ.get("LAVKA_ADMIN_TG", "").strip()  # числовой Telegram ID владельца (узнать у @userinfobot)
+
 username = None  # заполняется после getMe
 _out = queue.Queue()
 _started = False
@@ -107,6 +109,14 @@ def _handle_update(u):
         name = c.execute("SELECT name FROM users WHERE id=?", (row["user_id"],)).fetchone()["name"]
         c.close()
         _send(chat_id, f"✅ Готово, {name}! Теперь сюда будут приходить новые сообщения. Отвязать: /stop")
+    elif text.startswith("/url"):
+        # текущий адрес туннеля — только владельцу
+        if ADMIN_TG and str(chat_id) == ADMIN_TG:
+            try:
+                with open(os.path.join(db.DATA, "public_url.txt"), encoding="utf-8") as f:
+                    _send(chat_id, f.read().strip() or "Адрес пока неизвестен")
+            except OSError:
+                _send(chat_id, "Туннель не запущен")
     elif text.startswith("/stop"):
         c = db.connect()
         c.execute("UPDATE users SET tg_chat_id=NULL WHERE tg_chat_id=?", (chat_id,))
