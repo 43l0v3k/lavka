@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Сервер в локалке работает по http. Когда выведешь наружу через HTTPS (Cloudflare Tunnel и т.п.),
+     поставь cleartextTrafficPermitted="false" и убери usesCleartextTraffic из манифеста. -->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="true" />
+</network-security-config>
