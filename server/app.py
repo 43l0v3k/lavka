@@ -622,4 +622,9 @@ if __name__ == "__main__":
     host = os.environ.get("LAVKA_HOST", "0.0.0.0")
     port = int(os.environ.get("LAVKA_PORT", "8080"))
     print(f"Лавка: http://{host}:{port}  (данные: {db.DATA})")
-    app.run(host=host, port=port, threaded=True)
+    try:
+        from waitress import serve  # нормальный сервер для выхода в интернет
+        serve(app, host=host, port=port, threads=8)
+    except ImportError:
+        print("waitress не установлен, запускаю встроенный сервер Flask (pip install waitress)")
+        app.run(host=host, port=port, threaded=True)

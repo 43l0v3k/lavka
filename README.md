@@ -35,6 +35,21 @@ Windows: `set LAVKA_TG_TOKEN=...` перед `python app.py`. Linux: `LAVKA_TG_T
 
 **Для продакшена** (когда выведешь в интернет) вместо `app.run` запускай через waitress: `pip install waitress`, `waitress-serve --port=8080 app:app`. Наружу — через Cloudflare Tunnel (без белого IP), тогда будет и HTTPS.
 
+## 1а. Выход в интернет через Cloudflare Tunnel
+
+Белый IP и проброс портов не нужны, HTTPS получаешь бесплатно.
+
+1. `pip install -r server/requirements.txt`
+2. Скачай `cloudflared` с https://github.com/cloudflare/cloudflared/releases (для Windows — `cloudflared-windows-amd64.exe`, переименуй в `cloudflared.exe`, положи в `server/`).
+3. Запусти `server/start.bat` (Linux: `server/start.sh`).
+4. В окне туннеля появится адрес `https://что-то-там.trycloudflare.com`. Его открывай в браузере и вписывай в приложении (Профиль → Адрес сервера).
+
+Минусы быстрого туннеля: адрес **меняется при каждом запуске**, и он работает, только пока включены комп и окно с туннелем. Постоянный адрес — это именованный туннель: нужен бесплатный аккаунт Cloudflare и свой домен (`cloudflared tunnel login` → `create` → `route dns`).
+
+Если включил Telegram-бота, задай `LAVKA_PUBLIC_URL` на адрес туннеля, тогда в уведомлении будет ссылка на чат.
+
+⚠️ Когда сервер виден из интернета, регистрация открыта всем. Следи за размером `server/data/uploads`.
+
 ## 2. Telegram-бот
 
 1. В Telegram открой @BotFather → `/newbot` → получи токен.
